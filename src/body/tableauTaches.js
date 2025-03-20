@@ -1,28 +1,18 @@
-import React, { useState, useEffect } from "react";
-import data from './../taches.json'; // ton fichier JSON
+import React, { useState, useContext } from "react";
+import { TacheContext } from "../App";
 
 function TableauTaches() {
-    const [taches, setTaches] = useState([]);
+    const {taches, setTaches} = useContext(TacheContext);
     const [expandedTache, setExpandedTache] = useState(null); // Gère quelle tâche est étendue
 
-    useEffect(() => {
-        if (Array.isArray(data.taches)) {
-            setTaches(data.taches); // Accède au tableau "taches" dans l'objet JSON
-        } else {
-            console.error("Les données de tâches ne sont pas un tableau.", data.taches);
-        }
-    }, []);
-
-    // Fonction pour changer l'état de la tâche
     const handleEtatChange = (id, newEtat) => {
         const updatedTaches = taches.map((tache) => {
             if (tache.id === id) {
-                return { ...tache, etat: newEtat };
+                return { ...tache, etat: newEtat }; // Met à jour l'état de la tâche modifiée
             }
             return tache;
         });
-        setTaches(updatedTaches);
-        // Ici tu peux mettre à jour ton fichier JSON si nécessaire
+        setTaches(updatedTaches); // Mets à jour l'état global avec les nouvelles tâches
     };
 
     // Fonction pour basculer l'affichage des informations
@@ -30,9 +20,10 @@ function TableauTaches() {
         setExpandedTache(expandedTache === id ? null : id);
     };
 
-    return (
-        <div>
-            <h1>Tableau des tâches</h1>
+    return (<div>
+        <h1 className="titre-tab">Tableau des tâches</h1>
+        <div className="tableau-container">
+
             <table className="tableau-taches">
                 <thead>
                 <tr>
@@ -45,9 +36,7 @@ function TableauTaches() {
                 {taches.map((tache) => (
                     <tr key={tache.id}>
                         <td>
-                                <span
-                                    onClick={() => toggleDetails(tache.id)}
-                                >
+                                <span onClick={() => toggleDetails(tache.id)}>
                                     {tache.titre}
                                     {expandedTache === tache.id ? '▲' : '▼'} {/* Flèche */}
                                 </span>
@@ -64,10 +53,12 @@ function TableauTaches() {
                                 value={tache.etat}
                                 onChange={(e) => handleEtatChange(tache.id, e.target.value)}
                             >
-                                <option value="Nouveau">Nouveau</option>
-                                <option value="En attente">En attente</option>
-                                <option value="Reussi">Réussi</option>
-                                <option value="En cours">En cours</option>
+                                <option value="nouveau">Nouveau</option>
+                                <option value="en attente">En attente</option>
+                                <option value="réussi">Réussi</option>
+                                <option value="en cours">En cours</option>
+                                <option value="abandonné">Abandonné</option>
+
                             </select>
                         </td>
                         <td>{tache.deadline}</td>
@@ -75,6 +66,7 @@ function TableauTaches() {
                 ))}
                 </tbody>
             </table>
+        </div>
         </div>
     );
 }
