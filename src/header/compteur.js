@@ -1,20 +1,18 @@
-import React from "react";
-import data from './../taches.json'; // ton fichier JSON
+import React, { useContext } from "react";
+import { TacheContext } from "../App";
+import { ETAT_TERMINE } from "../enum";
 
+function Compteur() {
+    const { taches } = useContext(TacheContext);
+    const totalTaches = taches.length;
+    const nonFinies = taches.filter(tache => !ETAT_TERMINE.includes(tache.etat)).length;
 
-function Compteur(){
-    let compteur = 0;
-    if (Array.isArray(data.taches)) {
-        compteur = data.taches.length;
-    }
     return (
-        <div>
-            <h1>
-                {compteur}
-            </h1>
+        <div className="compteur">
+            <h1>Total : {totalTaches}</h1>
+            <h2>Non finies : {nonFinies} </h2>
         </div>
-    )
+    );
 }
-
 
 export default Compteur;

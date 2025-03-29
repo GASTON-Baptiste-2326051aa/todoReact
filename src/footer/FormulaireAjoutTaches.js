@@ -1,37 +1,45 @@
 import { useContext } from "react";
-import { TacheContext } from "../App";
-import { tache } from "../objects/tache"; // si tu as exporté ta classe comme ça
+import { TacheContext, CategorieContext, RelationContext } from "../App";
+import { tache } from "../objects/tache";
+import { relation } from "../objects/relation";
 
 function FormulaireAjoutTaches() {
-    const {taches, setTaches } = useContext(TacheContext);
+    const { taches, setTaches } = useContext(TacheContext);
+    const { categories } = useContext(CategorieContext);
+    const { relations, setRelations } = useContext(RelationContext);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const form = e.target;
+        const selectedCategorieId = form.categorie.value;
         try {
             const nouvelleTache = new tache(
+                Date.now(),
                 form.titre.value,
                 form.deadline.value,
-                form.categorie.value || null,
+                selectedCategorieId || null,
                 form.etat.value,
                 form.description.value || null,
                 form.urgent.checked,
                 new Date().toISOString().split("T")[0]
-
             );
-            nouvelleTache.id = Date.now();
             setTaches([...taches, nouvelleTache]);
+            if (selectedCategorieId !== "aucune") {
+                const nouvelleRelation = new relation(
+                    Date.now(),
+                    nouvelleTache.id,
+                    selectedCategorieId
+                );
+                setRelations([...relations, nouvelleRelation]);
+            }
+
             form.reset();
             alert("Tâche ajoutée !");
-        }
-        catch (error) {
+        } catch (error) {
             alert(error.message);
             return;
         }
-
-        // Ajoute un id unique
-
     };
 
     return (
@@ -50,7 +58,12 @@ function FormulaireAjoutTaches() {
 
             <section>
                 <label htmlFor="categorie">Catégorie</label>
-                <input type="text" id="categorie" name="categorie" />
+                <select id="categorie" name="categorie">
+                    {categories.map((categorie) => (
+                        <option key={categorie.id} value={categorie.id}>{categorie.titre}</option>
+                    ))}
+                    <option value="aucune">Aucune catégorie</option>
+                </select>
             </section>
 
             <section>
